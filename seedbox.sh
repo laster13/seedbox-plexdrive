@@ -1485,7 +1485,7 @@ echo -e "${CCYAN}INSTALLATION${CEND}"
 			;;
 
 		8)
-		exit
+		exit 0
 
 		;;
 
