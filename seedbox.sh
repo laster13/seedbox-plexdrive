@@ -672,7 +672,7 @@ echo -e "${CCYAN}INSTALLATION${CEND}"
 			      - proxy
 
 			  medusa:
-			    image: xataz/medusa
+			    image: linuxserver/medusa
 			    container_name: medusa
 			    restart: unless-stopped
 			    hostname: medusa
