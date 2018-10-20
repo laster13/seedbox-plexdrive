@@ -695,7 +695,7 @@ echo -e "${CCYAN}INSTALLATION${CEND}"
 				  
 			  torrent:
 			    container_name: torrent
-			    image: xataz/rtorrent-rutorrent
+			    image: xataz/rtorrent-rutorrent:filebot
 			    restart: unless-stopped
 			    hostname: torrent
 			    labels:
@@ -705,12 +705,16 @@ echo -e "${CCYAN}INSTALLATION${CEND}"
 			      - traefik.docker.network=${PROXY_NETWORK}
 			      - traefik.frontend.auth.basic=${VAR}
 			    environment:
+			      - FILEBOT_RENAME_METHOD=copy
+			      - FILEBOT_RENAME_MOVIES={n} ({y})/{n} ({y})
 			      - UID=1001
 			      - GID=1001
 			      - DHT_RTORRENT=on
 			      - PORT_RTORRENT=6881
 			    volumes:
+			      - ${VOLUMES_ROOT_PATH}/plexdrive/Pre:${MountLocal}
 			      - ${VOLUMES_ROOT_PATH}/rutorrent/downloads:/data/torrents
+			      - ${VOLUMES_ROOT_PATH}/rutorrent/filebot:/scripts
 			      - ${VOLUMES_ROOT_PATH}/rutorrent/data:/data
 			      - ${VOLUMES_ROOT_PATH}/rutorrent/config:/config
 			    networks:
@@ -1079,11 +1083,67 @@ echo -e "${CCYAN}INSTALLATION${CEND}"
 					clear
 					logo.sh
 				else
+					export $(xargs </mnt/.env)
 					docker-compose up -d torrent
 					progress-bar 20
 					echo ""
 					echo -e "${CGREEN}Installation de Rtorrent réussie${CEND}"
 					echo ""
+					## supression des volumes crées par défault pour filebot
+					rm -rf ${VOLUMES_ROOT_PATH}/rutorrent/data/Media
+					
+					## Par défault plex_autoscan se lance à partir d'un Webook crée dans sonarr, radarr .. Ce script permet de lancer plex_autoscan si ajout manuel dans rutorrent
+					mkdir -p ${VOLUMES_ROOT_PATH}/rutorrent/filebot
+					cat <<-'EOF' > ${VOLUMES_ROOT_PATH}/rutorrent/filebot/plex_autoscan_start.sh
+					#!/bin/sh
+
+					## récupération des variables
+					export $(xargs </mnt/.env)
+
+					## Si le script est déjà lancé on sort
+					if pidof -o %PPID -x "$0"; then
+					echo "$(date "+%d.%m.%Y %T") Already running, exiting."
+					exit 1
+					fi
+	
+					var=$(ls -a /data/Media/TV | sed -e "/\.$/d" | wc -l)
+					var1=$(ls -a /data/Media/Movies | sed -e "/\.$/d" | wc -l)
+					var2=$(ls -a /data/Media/Animes | sed -e "/\.$/d" | wc -l)
+					var3=$(ls -a /data/Media/Music | sed -e "/\.$/d" | wc -l)
+
+					## On vérifie si les dossiers sont vides, dans le cas contraire plex_autoscan se lance
+					if [ $var -ge 1 -o $var1 -ge 1 -o $var2 -ge 1 -o $var3 -ge 1 ]; then
+					SAVEIFS=$IFS
+					IFS=$(echo -en "\n\b")
+					FILES=/data/Media/*/*/*
+					for f in $FILES
+					do
+					echo "$f"
+					curl -d "eventType=Manual&filepath=$f" http://plex:3468/9c4b81fe234e4d6eb9011cefe514d915
+					done
+					
+					# restore $IFS
+					IFS=$SAVEIFS
+					else 
+					exit 0
+					fi
+					EOF
+					chmod +x ${VOLUMES_ROOT_PATH}/rutorrent/filebot/plex_autoscan_start.sh
+
+					# Définition des variables dans le fichier postdl
+					docker exec -t torrent sed -i 's/\<unsorted=y\>/& "exec=\/scripts\/plex_autoscan_start.sh"/' /usr/local/bin/postdl
+					var=/data/Media
+					docker exec -t torrent sed -i -e "s#$var#${MountLocal}#g" /usr/local/bin/postdl
+					docker exec -t torrent sed -i -e "s/Movies/${FILMS}/g" /usr/local/bin/postdl
+					docker exec -t torrent sed -i -e "s/TV/${SERIES}/g" /usr/local/bin/postdl
+					docker exec -t torrent sed -i -e "s/Music/${MUSIC}/g" /usr/local/bin/postdl
+					docker exec -t torrent sed -i -e "s/Animes/${ANIMES}/g" /usr/local/bin/postdl
+					docker exec -t torrent sed -i -e "s#$var#${MountLocal}#g" /scripts/plex_autoscan_start.sh
+					docker exec -t torrent sed -i -e "s/Movies/${FILMS}/g" /scripts/plex_autoscan_start.sh
+					docker exec -t torrent sed -i -e "s/TV/${SERIES}/g" /scripts/plex_autoscan_start.sh
+					docker exec -t torrent sed -i -e "s/Music/${MUSIC}/g" /scripts/plex_autoscan_start.sh
+					docker exec -t torrent sed -i -e "s/Animes/${ANIMES}/g" /scripts/plex_autoscan_start.sh
+					docker exec -t torrent chown -R 1001:1001 /mnt
 					read -p "Appuyer sur la touche Entrer pour continuer"
 					clear
 					logo.sh
@@ -1373,16 +1433,20 @@ echo -e "${CCYAN}INSTALLATION${CEND}"
 				  "SERVER_PASS": "9c4b81fe234e4d6eb9011cefe514d915",
 				  "SERVER_PATH_MAPPINGS": {
 				      "${MountUnion}/${FILMS}/": [
-				          "/movies/"
+				          "/movies/",
+				          "${MountLocal}/${FILMS}/"
 				      ],
 				      "${MountUnion}/${SERIES}/": [
-				          "/tv/"
+				          "/tv/",
+					  "${MountLocal}/${SERIES}/"
 				      ],
 				      "${MountUnion}/${ANIMES}/": [
-				          "/animes/"
+				          "/animes/",
+				          "${MountLocal}/${ANIMES}/"
 				      ],
 				      "${MountUnion}/${MUSIC}/": [
-				          "/music/"
+				          "/music/",
+				          "${MountLocal}/${MUSIC}/"
 				      ]
 				  },
 				  "SERVER_PORT": 3468,
