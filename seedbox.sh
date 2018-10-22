@@ -55,12 +55,12 @@ echo -e "${CCYAN}INSTALLATION${CEND}"
 			echo -e "${CGREEN}-------------------------------------------------------------------------------------------------------------------------${CEND}"
 			echo ""                        
 			apt-get install \
+			unzip \
                         apt-transport-https \
 			apache2-utils \
                         ca-certificates \
                         curl \
                         gnupg2 \
-			unzip \
 			lsb-release \
                         software-properties-common
                         curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
