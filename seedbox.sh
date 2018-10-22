@@ -60,6 +60,7 @@ echo -e "${CCYAN}INSTALLATION${CEND}"
                         ca-certificates \
                         curl \
                         gnupg2 \
+			unzip \
 			lsb-release \
                         software-properties-common
                         curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
