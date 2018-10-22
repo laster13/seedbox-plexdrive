@@ -55,9 +55,9 @@ echo -e "${CCYAN}INSTALLATION${CEND}"
 			echo -e "${CGREEN}-------------------------------------------------------------------------------------------------------------------------${CEND}"
 			echo ""                        
 			apt-get install \
+			apache2-utils \
 			unzip \
                         apt-transport-https \
-			apache2-utils \
                         ca-certificates \
                         curl \
                         gnupg2 \
