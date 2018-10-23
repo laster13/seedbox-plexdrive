@@ -625,7 +625,8 @@ echo -e "${CCYAN}INSTALLATION${CEND}"
 			    volumes:
 			      - ${VOLUMES_ROOT_PATH}/sonarr/config:/config
 			      - ${VOLUMES_ROOT_PATH}/rutorrent/downloads:/downloads
-			      - ${VOLUMES_ROOT_PATH}/plexdrive/Union/${SERIES}:/tv
+			      - ${VOLUMES_ROOT_PATH}/plexdrive/Union/${SERIES}:/tv/${SERIES}
+			      - ${VOLUMES_ROOT_PATH}/plexdrive/Union/${Animes}:/tv/${Animes}
 			    networks:
 			      - proxy
 
