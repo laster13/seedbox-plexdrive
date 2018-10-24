@@ -263,7 +263,7 @@ echo -e "${CCYAN}INSTALLATION${CEND}"
 			done < ${VOLUMES_ROOT_PATH}/local.txt
 
 			FILMS=$(grep -E 'films|film|Films|FILMS|MOVIES|Movies|movies|movie|VIDEOS|VIDEO|Video|Videos' ${VOLUMES_ROOT_PATH}/local.txt | cut -d: -f2 | cut -d ' ' -f2)
-			SERIES=$(grep -E 'series|TV|tv|Series|SERIES|SERIES TV|Series TV|series tv|serie tv|serie TV|series TV' ${VOLUMES_ROOT_PATH}/local.txt | cut -d: -f2 | cut -d ' ' -f2-3)
+			SERIES=$(grep -E 'series|TV|tv|Series|SERIES|SERIES TV|Series TV|series tv|serie tv|serie TV|series TV|Shows' ${VOLUMES_ROOT_PATH}/local.txt | cut -d: -f2 | cut -d ' ' -f2-3)
 			ANIMES=$(grep -E 'ANIMES|ANIME|Animes|Anime|Animation|ANIMATION|animes|anime' ${VOLUMES_ROOT_PATH}/local.txt | cut -d: -f2 | cut -d ' ' -f2)
 			MUSIC=$(grep -E 'MUSIC|Music|music|Musiques|Musique|MUSIQUE|MUSIQUES|musiques|musique' ${VOLUMES_ROOT_PATH}/local.txt | cut -d: -f2 | cut -d ' ' -f2)
 			
@@ -625,8 +625,7 @@ echo -e "${CCYAN}INSTALLATION${CEND}"
 			    volumes:
 			      - ${VOLUMES_ROOT_PATH}/sonarr/config:/config
 			      - ${VOLUMES_ROOT_PATH}/rutorrent/downloads:/downloads
-			      - ${VOLUMES_ROOT_PATH}/plexdrive/Union/${SERIES}:/tv/${SERIES}
-			      - ${VOLUMES_ROOT_PATH}/plexdrive/Union/${Animes}:/tv/${Animes}
+			      - ${VOLUMES_ROOT_PATH}/plexdrive/Union:/tv
 			    networks:
 			      - proxy
 
