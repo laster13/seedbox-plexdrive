@@ -1358,7 +1358,7 @@ echo -e "${CCYAN}INSTALLATION${CEND}"
 				done > categories.log
 
 				ID_FILM=$(grep -E 'films|film|Films|FILMS|MOVIES|Movies|movies|movie|VIDEOS|VIDEO|Video|Videos' categories.log | cut -d: -f1 | cut -d ' ' -f1)
-				ID_SERIE=$(grep -E 'series|TV|tv|Series|SERIES|SERIES TV|Series TV|series tv|serie tv|serie TV|series TV' categories.log | cut -d: -f1 | cut -d ' ' -f1)
+				ID_SERIE=$(grep -E 'series|TV|tv|Series|SERIES|SERIES TV|Series TV|series tv|serie tv|serie TV|series TV|Shows' categories.log | cut -d: -f1 | cut -d ' ' -f1)
 				ID_ANIME=$(grep -E 'ANIMES|ANIME|Animes|Anime|Animation|ANIMATION|animes|anime' categories.log | cut -d: -f1 | cut -d ' ' -f1)
 				ID_MUSIC=$(grep -E 'MUSIC|Music|music|Musiques|Musique|MUSIQUE|MUSIQUES|musiques|musique' categories.log | cut -d: -f1 | cut -d ' ' -f1)
 
