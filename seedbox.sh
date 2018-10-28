@@ -53,32 +53,54 @@ echo -e "${CCYAN}INSTALLATION${CEND}"
 			echo -e "${CGREEN}-------------------------------------------------------------------------------------------------------------------------${CEND}"
 			echo -e "${CCYAN}					INSTALLATION DOCKER ET DOCKER-COMPOSE						   ${CEND}"
 			echo -e "${CGREEN}-------------------------------------------------------------------------------------------------------------------------${CEND}"
-			echo ""                        
-			apt-get install \
-			apache2-utils \
-			unzip \
-                        apt-transport-https \
-                        ca-certificates \
-                        curl \
-                        gnupg2 \
-			lsb-release \
-                        software-properties-common
-                        curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
-			curl https://raw.githubusercontent.com/scopatz/nanorc/master/install.sh | sh
-                        add-apt-repository \
-                        "deb [arch=amd64] https://download.docker.com/linux/debian \
-                        $(lsb_release -cs) \
-                        stable"
-                        apt update
-                        apt install docker-ce
-                        curl -L https://github.com/docker/compose/releases/download/1.22.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
-                        chmod +x /usr/local/bin/docker-compose
-			clear
-			logo.sh
-			echo -e "${CCYAN}Installation docker & docker compose terminée${CEND}"
 			echo ""
-			read -p "Appuyer sur la touche Entrer pour revenir au menu principal"	
-			seedbox.sh
+			# Installation possible sur debian ou ubuntu
+			OS=$(cat /etc/*release | grep ^NAME | tr -d 'NAME="')
+			if [ "$OS" = "Ubuntu" ]
+			then
+				apt-get install \
+				apache2
+				unzip
+				apt install docker.io
+                        	curl -L https://github.com/docker/compose/releases/download/1.22.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+                        	chmod +x /usr/local/bin/docker-compose
+				clear
+				logo.sh
+				echo -e "${CCYAN}Installation docker & docker compose terminée${CEND}"
+				echo ""
+				read -p "Appuyer sur la touche Entrer pour revenir au menu principal"
+				touch /etc/apache2/.htpasswd
+				seedbox.sh
+
+			else
+				apt-get install \
+				apache2-utils \
+				unzip \
+                        	apt-transport-https \
+                        	ca-certificates \
+                        	curl \
+                        	gnupg2 \
+				lsb-release \
+                        	software-properties-common
+                        	curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
+				curl https://raw.githubusercontent.com/scopatz/nanorc/master/install.sh | sh
+                        	add-apt-repository \
+                        	"deb [arch=amd64] https://download.docker.com/linux/debian \
+                        	$(lsb_release -cs) \
+                        	stable"
+                        	apt update
+                        	apt install docker-ce
+                        	curl -L https://github.com/docker/compose/releases/download/1.22.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+                        	chmod +x /usr/local/bin/docker-compose
+				clear
+				logo.sh
+				echo -e "${CCYAN}Installation docker & docker compose terminée${CEND}"
+				echo ""
+				read -p "Appuyer sur la touche Entrer pour revenir au menu principal"
+				seedbox.sh
+
+				fi
+
 		;;
 
 		2) 	## Mise en place des variables necéssaire au docker-compose
