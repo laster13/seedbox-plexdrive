@@ -1140,6 +1140,10 @@ echo -e "${CCYAN}INSTALLATION${CEND}"
 					docker exec -t torrent sed -i -e "s/TV/${SERIES}/g" /usr/local/bin/postdl
 					docker exec -t torrent sed -i -e "s/Music/${MUSIC}/g" /usr/local/bin/postdl
 					docker exec -t torrent sed -i -e "s/Animes/${ANIMES}/g" /usr/local/bin/postdl
+					docker exec -t torrent sed -i '/*)/,/;;/d' /usr/local/bin/postdl
+					docker exec -t torrent sed -i -e "s#films|movies|film|movie#${FILMS,,}#g" /usr/local/bin/postdl
+					docker exec -t torrent sed -i -e "s#music|musics|musique|musiques#${MUSIC,,}#g" /usr/local/bin/postdl
+					docker exec -t torrent sed -i -e "s#tv|\"tv shows\"|series|serie#${SERIES,,}#g" /usr/local/bin/postdl
 					docker exec -t torrent sed -i -e "s#$var#${MountLocal}#g" /scripts/plex_autoscan_start.sh
 					docker exec -t torrent sed -i -e "s/Movies/${FILMS}/g" /scripts/plex_autoscan_start.sh
 					docker exec -t torrent sed -i -e "s/TV/${SERIES}/g" /scripts/plex_autoscan_start.sh
