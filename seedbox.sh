@@ -471,7 +471,6 @@ echo -e "${CCYAN}INSTALLATION${CEND}"
 				fi
 
 			## création d'une authentification pour rtorrent
-			touch /etc/apache2/.htpasswd
 			VAR=$(htpasswd -c /etc/apache2/.htpasswd $USERNAME 2>/dev/null)
 			VAR=$(sed -e 's/\$/\$$/g' /etc/apache2/.htpasswd 2>/dev/null)
 			export VAR
