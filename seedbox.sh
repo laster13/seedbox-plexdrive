@@ -34,7 +34,7 @@ logo.sh
 echo ""
 echo -e "${CCYAN}INSTALLATION${CEND}"
 	echo -e "${CGREEN}${CEND}"
-	echo -e "${CGREEN}   1) Installation de docker && docker-compose ${CEND}"
+	echo -e "${CGREEN}   1) Installation de docker && docker-compose (Ubuntu, Debian) ${CEND}"
 	echo -e "${CGREEN}   2) Configuration du docker-compose ${CEND}"
 	echo -e "${CGREEN}   3) Configuration rclone ${CEND}"
 	echo -e "${CGREEN}   4) Configuration plexdrive v-5.0.0 ${CEND}"
