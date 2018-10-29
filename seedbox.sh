@@ -307,6 +307,9 @@ echo -e "${CCYAN}INSTALLATION${CEND}"
 			echo -e "${CRED}	${CCYAN}RADARR_FQDN:${CRED}		radarr.${DOMAIN}							  ${CEND}"
 			echo -e "${CRED}	${CCYAN}SONARR_FQDN:${CRED}		sonarr.${DOMAIN}							  ${CEND}"
 			echo -e "${CRED}	${CCYAN}JACKETT_FQDN:${CRED}		jackett.${DOMAIN}							  ${CEND}"
+			echo -e "${CRED}	${CCYAN}JACKETT_FQDN:${CRED}		watcher.${DOMAIN}							  ${CEND}"
+			echo -e "${CRED}	${CCYAN}JACKETT_FQDN:${CRED}		ombi.${DOMAIN}								  ${CEND}"
+			echo -e "${CRED}	${CCYAN}JACKETT_FQDN:${CRED}		tautulli.${DOMAIN}							  ${CEND}"
 			echo -e "${CRED}-------------------------------------------------------------------------------------------------------------------------${CEND}"
 			echo -e "${CGREEN}				VOUS POUVEZ MODIFIER TOUTES CES VARIABLES A VOTRE CONVENANCE				  ${CEND}"	
 			echo -e "${CGREEN}				TAPER ENSUITE SUR LA TOUCHE ENTREE POUR VALIDER 					  ${CEND}"
@@ -322,6 +325,10 @@ echo -e "${CCYAN}INSTALLATION${CEND}"
 			export SONARR_FQDN=sonarr.${DOMAIN}
 			export JACKETT_FQDN=jackett.${DOMAIN}
 			export WATCHER_FQDN=watcher.${DOMAIN}
+			export WATCHER_FQDN=ombi.${DOMAIN}
+			export WATCHER_FQDN=tautulli.${DOMAIN}
+
+
 
 			read -rp "Voulez-vous modifier les variables ci dessus ? (o/n) : " EXCLUDE
 				if [[ "$EXCLUDE" = "o" ]] || [[ "$EXCLUDE" = "O" ]]; then
@@ -426,7 +433,7 @@ echo -e "${CCYAN}INSTALLATION${CEND}"
 						fi
 
 					echo -e "${CGREEN}${CEND}"
-					echo -e "${CCYAN}Sous domaine de watcher3${CEND}"
+					echo -e "${CCYAN}Sous domaine de Watcher3${CEND}"
 					read -rp "WATCHER_FQDN = " WATCHER_FQDN
 
 						if [ -n "$WATCHER_FQDN" ]
@@ -435,6 +442,30 @@ echo -e "${CCYAN}INSTALLATION${CEND}"
 						else
 			 				WATCHER_FQDN=watcher.${DOMAIN}
 			 				export WATCHER_FQDN
+						fi
+
+					echo -e "${CGREEN}${CEND}"
+					echo -e "${CCYAN}Sous domaine de Ombi${CEND}"
+					read -rp "OMBI_FQDN = " OMBI_FQDN
+
+						if [ -n "$OMBI_FQDN" ]
+						then
+			 				export OMBI_FQDN=${OMBI_FQDN}.${DOMAIN}
+						else
+			 				OMBI_FQDN=ombi.${DOMAIN}
+			 				export OMBI_FQDN
+						fi
+
+					echo -e "${CGREEN}${CEND}"
+					echo -e "${CCYAN}Sous domaine de Tautulli${CEND}"
+					read -rp "TAUTULLI_FQDN = " TAUTULLI_FQDN
+
+						if [ -n "$TAUTULLI_FQDN" ]
+						then
+			 				export TAUTULLI_FQDN=${TAUTULLI_FQDN}.${DOMAIN}
+						else
+			 				TAUTULLI_FQDN=tautulli.${DOMAIN}
+			 				export TAUTULLI_FQDN
 						fi
 
 				fi
@@ -475,6 +506,8 @@ echo -e "${CCYAN}INSTALLATION${CEND}"
 			SONARR_FQDN=$SONARR_FQDN
 			JACKETT_FQDN=$JACKETT_FQDN
 			WATCHER_FQDN=$WATCHER_FQDN
+			OMBI_FQDN=$OMBI_FQDN
+			TAUTULLI_FQDN=$TAUTULLI_FQDN
 			EOF
 
 			## Création d'un fichier traefik.toml
@@ -755,8 +788,6 @@ echo -e "${CCYAN}INSTALLATION${CEND}"
 			      - traefik.frontend.rule=Host:${JACKETT_FQDN}
 			      - traefik.port=9117
 			      - traefik.docker.network=${PROXY_NETWORK}
-			    ports:
-			      - 9117:9117
 			    environment:
 			      - TZ=Paris/Europe
 			      - PUID=0
@@ -764,6 +795,45 @@ echo -e "${CCYAN}INSTALLATION${CEND}"
 			    volumes:
 			      - ${VOLUMES_ROOT_PATH}/Jackett/config:/config
 			      - ${VOLUMES_ROOT_PATH}/Jackett/downloads:/downloads
+			    networks:
+			      - proxy
+
+			  ombi:
+			    container_name: ombi
+			    image: linuxserver/ombi:latest
+			    restart: unless-stopped
+			    hostname: ombi
+			    labels:
+			      - traefik.enable=true
+			      - traefik.frontend.rule=Host:${OMBI_FQDN}
+			      - traefik.port=3579
+			      - traefik.docker.network=${PROXY_NETWORK}
+			    environment:
+			      - TZ=Paris/Europe
+			      - PUID=0
+			      - PGID=0
+			    volumes:
+			      - ${VOLUMES_ROOT_PATH}/ombi/config:/config
+			    networks:
+			      - proxy
+
+			  tautulli:
+			    container_name: tautulli
+			    image: tautulli/tautulli
+			    restart: unless-stopped
+			    hostname: tautulli
+			    labels:
+			      - traefik.enable=true
+			      - traefik.frontend.rule=Host:${TAUTULLI_FQDN}
+			      - traefik.port=8181
+			      - traefik.docker.network=${PROXY_NETWORK}
+			    environment:
+			      - TZ=Paris/Europe
+			      - PUID=0
+			      - PGID=0
+			    volumes:
+			      - ${VOLUMES_ROOT_PATH}/tautulli/config:/config
+			      - ${VOLUMES_ROOT_PATH}/plex/config/Library/Application Support/Plex Media Server/Logs:/logs:ro
 			    networks:
 			      - proxy
 
@@ -1010,9 +1080,11 @@ echo -e "${CCYAN}INSTALLATION${CEND}"
 			echo -e "${CGREEN}   6) Radarr ${CEND}"
 			echo -e "${CGREEN}   7) Watcher ${CEND}"
 			echo -e "${CGREEN}   8) Jackett ${CEND}"
-			echo -e "${CGREEN}   9) Retour Menu Principal ${CEND}"
+			echo -e "${CGREEN}   9) Ombi ${CEND}"
+			echo -e "${CGREEN}   10) Tautulli ${CEND}"
+			echo -e "${CGREEN}   11) Retour Menu Principal ${CEND}"
 			echo ""
-			read -p "Appli choix [1-8]: " -e -i 1 APPLI
+			read -p "Appli choix [1-11]: " -e -i 1 APPLI
 			echo ""			
 			case $APPLI in
 				1)
@@ -1334,6 +1406,46 @@ echo -e "${CCYAN}INSTALLATION${CEND}"
 				;;
 
 				9)
+				if docker ps -a | grep -q ombi; then
+					echo -e "${CGREEN}Ombi est déjà lancé${CEND}"
+					echo ""
+					read -p "Appuyer sur la touche Entrer pour retourner au menu"
+					clear
+					logo.sh
+				else
+					docker-compose up -d ombi
+					progress-bar 20
+					echo ""
+					echo -e "${CGREEN}Installation de Ombi réussie${CEND}"
+					echo ""
+					read -p "Appuyer sur la touche Entrer pour continuer"
+					clear
+					logo.sh
+				fi
+
+				;;
+
+				10)
+				if docker ps -a | grep -q tautulli; then
+					echo -e "${CGREEN}Tautulli est déjà lancé${CEND}"
+					echo ""
+					read -p "Appuyer sur la touche Entrer pour retourner au menu"
+					clear
+					logo.sh
+				else
+					docker-compose up -d tautulli
+					progress-bar 20
+					echo ""
+					echo -e "${CGREEN}Installation de Tautulli réussie${CEND}"
+					echo ""
+					read -p "Appuyer sur la touche Entrer pour continuer"
+					clear
+					logo.sh
+				fi
+
+				;;
+
+				11)
 				sortir=true
 				seedbox.sh
 
