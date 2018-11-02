@@ -325,8 +325,8 @@ echo -e "${CCYAN}INSTALLATION${CEND}"
 			export SONARR_FQDN=sonarr.${DOMAIN}
 			export JACKETT_FQDN=jackett.${DOMAIN}
 			export WATCHER_FQDN=watcher.${DOMAIN}
-			export WATCHER_FQDN=ombi.${DOMAIN}
-			export WATCHER_FQDN=tautulli.${DOMAIN}
+			export OMBI_FQDN=ombi.${DOMAIN}
+			export TAUTULLI_FQDN=tautulli.${DOMAIN}
 
 
 
